@@ -1,0 +1,57 @@
+﻿/*loading特效圖等待動畫*/
+@keyframes lds-blocks {
+    0% {
+        background: #689cc5;
+    }
+
+    12.5% {
+        background: #689cc5;
+    }
+
+    12.625% {
+        background: #93dbe9;
+    }
+
+    100% {
+        background: #93dbe9;
+    }
+}
+
+@-webkit-keyframes lds-blocks {
+    0% {
+        background: #689cc5;
+    }
+
+    12.5% {
+        background: #689cc5;
+    }
+
+    12.625% {
+        background: #93dbe9;
+    }
+
+    100% {
+        background: #93dbe9;
+    }
+}
+
+.lds-blocks {
+    position: relative;
+}
+
+    .lds-blocks div {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: #93dbe9;
+        -webkit-animation: lds-blocks 1s linear infinite;
+        animation: lds-blocks 1s linear infinite;
+    }
+
+.lds-blocks {
+    width: 100px !important;
+    height: 100px !important;
+    -webkit-transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
+    transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
+}
+/*end loading特效圖等待動畫*/

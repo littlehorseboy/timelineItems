@@ -1,0 +1,30 @@
+.ui-alert-content{
+  position: fixed;
+  z-index: 9999;
+}
+.ui-alert-content-top-right{
+  top: 1rem;
+  right: 1rem;
+}
+.ui-alert-content-top-center{
+  top: 20px;
+  margin: 0 0 0 -180px;
+  left: 50%;
+}
+.ui-alert-content-top-left{
+  top: 1rem;
+  left: 1rem;
+}
+.ui-alert-content-bottom-right{
+  bottom: 1rem;
+  right: 1rem;
+}
+.ui-alert-content-bottom-center{
+  bottom: 0;
+  margin: 0 0 0 -180px;
+  left: 50%;
+}
+.ui-alert-content-bottom-left{
+  bottom: 1rem;
+  left: 1rem;
+}

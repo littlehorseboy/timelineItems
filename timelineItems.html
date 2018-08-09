@@ -1,0 +1,485 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="description" content="timeline">
+    <title>timeline</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="public/lib/vis-4.21.0/dist/vis-timeline-graph2d.min.css">
+    <!-- build:css -->
+    <link href="public/css/myStyle.css" rel="stylesheet">
+    <!-- endbuild -->
+    <style>
+        textarea {
+            height: 150px;
+            /* width: 800px !important; */
+        }
+
+        .mdl-textfield {
+            width: 100%;
+        }
+
+        #visualization {
+            width: 100%;
+        }
+
+        #loadDataInput {
+            height: 250px;
+        }
+
+        .borderGray {
+            border: 1px solid #DDD;
+            padding: 1rem;
+        }
+
+        .vis-item.red {
+            color: white;
+            background-color: red;
+            border-color: darkred;
+        }
+
+        .vis-item.blue {
+            color: white;
+            background-color: blue;
+            border-color: darkred;
+        }
+
+        .vis-item.vis-selected {
+            color: black;
+            border-color: #ffc200;
+            background-color: #fff785;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--6-col borderGray">
+            <span class="mdl-chip mdl-chip--deletable">
+                <span class="mdl-chip__text">新增 TIMELINEITEM</span>
+                <button type="button" class="mdl-chip__action">
+                    <i class="material-icons">library_add</i>
+                </button>
+            </span>
+            <div class="mdl-textfield mdl-js-textfield">
+                <textarea id="insertDataInput" class="mdl-textfield__input" type="text">
+{ 
+    "content": "新化區場勘",
+    "start": "2018-01-08 08:15:00",
+    "end": "2018-01-08 15:15:00",
+    "group": "1",
+    "subgroup": "1",
+    "className": "red",
+    "title": "新化區場勘" 
+}
+                        </textarea>
+                <label class="mdl-textfield__label" for="updateDataInput">新增</label>
+            </div>
+            <input type="button" id="insertBtn" class="mdl-button mdl-js-button mdl-button--raised" value="新增">
+        </div>
+        <div class="mdl-cell mdl-cell--6-col borderGray">
+            <span class="mdl-chip mdl-chip--deletable">
+                <span class="mdl-chip__text">修改 TIMELINEITEM</span>
+                <button type="button" class="mdl-chip__action">
+                    <i class="material-icons">mode_edit</i>
+                </button>
+            </span>
+            <div class="mdl-textfield mdl-js-textfield">
+                <textarea id="updateDataInput" class="mdl-textfield__input" type="text"></textarea>
+                <label class="mdl-textfield__label" for="insertDataInput">修改</label>
+            </div>
+            <input type="button" id="updateBtn" class="mdl-button mdl-js-button mdl-button--raised" value="修改完成送出">
+        </div>
+    </div>
+    <div class="mdl-grid">
+        <div id="visualization"></div>
+    </div>
+    <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--6-col borderGray">
+            <span class="mdl-chip mdl-chip--deletable">
+                <span class="mdl-chip__text">顯示所有的 TIMELINEITEM</span>
+                <button type="button" class="mdl-chip__action">
+                    <i class="material-icons">new_releases</i>
+                </button>
+            </span>
+            <div class="mdl-textfield mdl-js-textfield">
+                <textarea id="loadDataInput" class="mdl-textfield__input" type="text" readonly="readonly"></textarea>
+                <label class="mdl-textfield__label" for="loadDataInput">所有資料</label>
+            </div>
+            <!-- <input type="button" id="saveBtn" class="mdl-button mdl-js-button mdl-button--raised" value="將 timeline 的資料拉進來"> -->
+        </div>
+        <div class="mdl-cell mdl-cell--6-col borderGray">
+            <span class="mdl-chip mdl-chip--deletable">
+                <span class="mdl-chip__text">搜尋 TIMELINEITEM</span>
+                <button type="button" class="mdl-chip__action">
+                    <i class="material-icons">new_releases</i>
+                </button>
+            </span>
+            <div class="mdl-textfield mdl-js-textfield">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <select id="filterDataSelect1" class="mdl-textfield__input">
+                        <option></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                    <label class="mdl-textfield__label" for="filterDataSelect1">group 1</label>
+                </div>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <select id="filterDataSelect2" class="mdl-textfield__input">
+                        <option></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                    <label class="mdl-textfield__label" for="filterDataSelect2">group 2</label>
+                </div>
+            </div>
+            <input type="button" id="filterBtn" class="mdl-button mdl-js-button mdl-button--raised" value="篩選">
+        </div>
+    </div>
+
+    <div id="logMessage" class="mdl-js-snackbar mdl-snackbar">
+        <div class="mdl-snackbar__text"></div>
+        <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+
+    <!--<script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>-->
+    <script src="public/lib/uuidv4/uuidv4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+    <script src="public/lib/axios/axios.min.js"></script>
+    <script src="public/lib/sweetalert2-7.13.3/sweetalert2.js"></script>
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+    <script src="http://momentjs.com/downloads/moment-with-locales.js"></script>
+    <script src="public/lib/vis-4.21.0/dist/vis.js"></script>
+
+    <!-- build:js -->
+    <script src="public/js/myScript.js"></script>
+    <!-- endbuild -->
+
+    <script>
+        // var dataUrl = 'localhost:3001';
+        var dataUrl = '192.168.15.127:3001';
+        // var dataUrl = '35.200.60.186:3001';
+        var insertDataInput = document.querySelector('#insertDataInput');
+        var updateDataInput = document.querySelector('#updateDataInput');
+        var loadDataInput = document.querySelector('#loadDataInput');
+        var insertBtn = document.querySelector('#insertBtn');
+        var updateBtn = document.querySelector('#updateBtn');
+        var saveBtn = document.querySelector('#saveBtn');
+        var snackbarContainer = document.querySelector('#logMessage');
+
+        var updateSelectionId;
+        var items = new vis.DataSet(); // timeline 內的資料
+
+        var filterTempAllData; // 篩選功能時暫存所有的資料
+        var filterBtn = document.querySelector('#filterBtn');
+        var filterDataSelect1 = document.querySelector('#filterDataSelect1');
+        var filterDataSelect2 = document.querySelector('#filterDataSelect2');
+        var filterDataSelect1Value = null;
+        var filterDataSelect2Value = null;
+        filterDataSelect1.addEventListener('change', function (event) {
+            filterDataSelect1Value = event.target.value ? event.target.value : null;
+        });
+        filterDataSelect2.addEventListener('change', function (event) {
+            filterDataSelect2Value = event.target.value ? event.target.value : null;
+        });
+
+        var container = document.querySelector('#visualization'); // timeline 容器
+        var options = {
+            locale: 'zh-tw',
+            editable: true,
+            onAdd: function (item, callback) {
+                return false; //horseTODO
+                swal({
+                    input: 'textarea',
+                    inputPlaceholder: '新增欄位都還不確定',
+                    title: '新增',
+                    text: '新增欄位都還不確定',
+                    type: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '確定',
+                    cancelButtonText: '取消',
+                    inputValidator: function inputValidator(value) {
+                        return !value && '必填?';
+                    }
+                }).then(function (result) {
+                    if (result.value) {
+                        item.content = result.value;
+                        callback(item); // send back adjusted new item
+                    } else {
+                        callback(null); // cancel item creation
+                    }
+                });
+            },
+
+            onMove: function (item, callback) {
+                item.start = vis.moment(item.start).format('YYYY-MM-DD HH:mm:ss');
+                item.end = vis.moment(item.end).format('YYYY-MM-DD HH:mm:ss');
+
+                var text = 'Do you really want to move the item to ' +
+                    'start: ' + item.start + '\n' +
+                    'end: ' + item.end + '?';
+
+                delete item.id;
+                delete item.created_time;
+                delete item.updated_time;
+
+                swal({
+                    title: '移動',
+                    text: text,
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '確定',
+                    cancelButtonText: '取消',
+                }).then(function (result) {
+                    if (result.value) {
+                        axios({
+                            method: 'put',
+                            url: "http://" + dataUrl + "/api/items/" + updateSelectionId,
+                            data: item
+                        }).then(function (response) {
+                            var resData = response.data;
+                            var message = { message: resData };
+                            snackbarContainer.MaterialSnackbar.showSnackbar(message);
+                            item.id = updateSelectionId[0];
+                            callback(item); // send back adjusted new item
+
+                            saveData();
+                        });
+                    } else {
+                        callback(null); // cancel item creation
+                    }
+                });
+            },
+
+            //限制拖動範圍的手段
+            // onMoving: function (item, callback) {
+            //     if (item.start < min) item.start = min;
+            //     if (item.start > max) item.start = max;
+            //     if (item.end > max) item.end = max;
+
+            //     callback(item); // send back the (possibly) changed item
+            // },
+
+            // onUpdate: function (item, callback) {
+            //     prettyPrompt('Update item', 'Edit items text:', item.content, function (value) {
+            //         if (value) {
+            //             item.content = value;
+            //             callback(item); // send back adjusted item
+            //         }
+            //         else {
+            //             callback(null); // cancel updating the item
+            //         }
+            //     });
+            // },
+
+            onRemove: function (item, callback) {
+                swal({
+                    title: '刪除',
+                    text: '確認要刪除 ' + item.content + ' 這筆資料?',
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '確定',
+                    cancelButtonText: '取消',
+                }).then(function (result) {
+                    if (result.value) {
+                        axios({
+                            method: 'delete',
+                            url: "http://" + dataUrl + "/api/items/" + item.id,
+                        }).then(function (response) {
+                            var resData = response.data;
+
+                            var message = { message: resData };
+                            snackbarContainer.MaterialSnackbar.showSnackbar(message);
+
+                            callback(item); // send back adjusted item
+
+                            saveData();
+                        });
+                    }
+                    else {
+                        callback(null); // cancel updating the item
+                    }
+                });
+            }
+        };
+        var timeline = new vis.Timeline(container, items, options); // timeline
+
+        // 初始化 timeline 介面 (如果不先做這個 在針對 items.add 時, timeline 介面不會正常出現在畫面上)
+        timeline.setWindow(Date.now(), Date.now())
+
+        // load the initial data
+        function loadData() {
+            axios({
+                method: 'get',
+                url: "http://" + dataUrl + "/api/items",
+            }).then(function (response) {
+                var resData = response.data;
+
+                items.add(resData);
+                timeline.fit();
+
+                saveData();
+            });
+        }
+        // load the initial data
+        loadData();
+
+        // 新增
+        function insertData() {
+            var data = JSON.parse(insertDataInput.value);
+            axios({
+                method: 'post',
+                url: "http://" + dataUrl + "/api/items",
+                data: data
+            }).then(function (response) {
+                var resData = response.data;
+                var message = { message: resData.message };
+                snackbarContainer.MaterialSnackbar.showSnackbar(message);
+                data.id = resData.id;
+                items.add(data);
+                timeline.fit();
+
+                saveData();
+            });
+        }
+        insertBtn.onclick = insertData;
+
+        // 選取 timeline 上的物件
+        function onSelect(properties) {
+            //alert('selected items: ' + properties.items);
+            if (properties.event.type !== 'tap') {
+                return false;
+            }
+
+            if (properties.items.length) {
+                updateSelectionId = properties.items;
+
+                var dataArray = items.get(properties.items, {
+                    type: { start: 'ISODate', end: 'ISODate' }
+                });
+
+                if (dataArray.length === 1) {
+                    var data = dataArray[0];
+                }
+
+                delete data.id;
+                data.start = vis.moment(data.start).format('YYYY-MM-DD HH:mm:ss');
+                data.end = vis.moment(data.end).format('YYYY-MM-DD HH:mm:ss');
+                updateDataInput.value = JSON.stringify(data, null, 2);
+                updateDataInput.parentElement.className += ' is-dirty';
+            }
+        }
+
+        // add event listener
+        timeline.on('select', onSelect);
+
+        // remove event listener
+        // timeline.off('select', onSelect);
+
+
+        //
+        function updateData() {
+            if (!updateSelectionId) {
+                return false;
+            }
+
+            var data = JSON.parse(updateDataInput.value);
+            delete data.created_time;
+            delete data.updated_time;
+            
+            axios({
+                method: 'put',
+                url: "http://" + dataUrl + "/api/items/" + updateSelectionId,
+                data: data
+            }).then(function (response) {
+                var resData = response.data;
+                var message = { message: resData };
+                snackbarContainer.MaterialSnackbar.showSnackbar(message);
+                data.id = updateSelectionId[0];
+                items.update(data);
+
+                saveData();
+            });
+        }
+        updateBtn.onclick = updateData;
+
+        // filter
+        function filterData() {
+            if (filterDataSelect1Value || filterDataSelect2Value) {
+                items.clear();
+                items.add(filterTempAllData.get({
+                    filter: function (item) {
+                        if (filterDataSelect1Value && filterDataSelect2Value)
+                            return item.group === filterDataSelect1Value && item.subgroup === filterDataSelect2Value;
+                        else if (filterDataSelect1Value)
+                            return item.group === filterDataSelect1Value;
+                        else if (filterDataSelect2Value)
+                            return item.subgroup === filterDataSelect2Value;
+                    }
+                }));
+                timeline.fit();
+            } else {
+                if (filterTempAllData.length) {
+                    items.clear();
+                    items.add(filterTempAllData.get());
+                    timeline.fit();
+                }
+            }
+        }
+        filterBtn.onclick = filterData;
+
+        // 讀取 timeline 內容
+        function saveData() {
+            // get the data from the DataSet
+            //
+            // Note that we specify the output type of the fields start and end
+            // as "ISODate", which is safely serializable. Other serializable types
+            // are "Number" (unix timestamp), "ASPDate" or "String" (without timezone!).
+            //
+            // Alternatively, it is possible to configure the DataSet to convert
+            // the output automatically to ISODates like:
+            //
+            //   var options = {
+            //     type: {start: 'ISODate', end: 'ISODate'}
+            //   };
+            //   var items = new vis.DataSet(options);
+            //   // now items.get() will automatically convert start and end to ISO dates.
+            //
+            var data = items.get({
+                type: { start: 'ISODate', end: 'ISODate' }
+            });
+
+            data.forEach(function (data) {
+                data.start = vis.moment(data.start).format('YYYY-MM-DD HH:mm:ss');
+                data.end = vis.moment(data.end).format('YYYY-MM-DD HH:mm:ss');
+            });
+
+            loadDataInput.value = JSON.stringify(data, null, 2);
+
+            if (loadDataInput.parentElement.className.indexOf('is-dirty' === -1))
+                loadDataInput.parentElement.className += ' is-dirty';
+
+            filterTempAllData = _.cloneDeep(items);
+        }
+        // saveBtn.onclick = saveData;
+
+    </script>
+</body>
+
+</html>
